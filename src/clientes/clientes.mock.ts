@@ -50,3 +50,4 @@ export const clientesMock: CreateClienteDto[] = [
         ticketMedio: 220
     }
 ]
+
