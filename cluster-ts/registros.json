@@ -1,0 +1,14 @@
+[
+  { "nome": "Zé", "falta": 0.25, "nota": 6.2, "sexo": "M", "trabalha": false },
+  { "nome": "Maria", "falta": 0.5, "nota": 7.9, "sexo": "F", "trabalha": true },
+  { "nome": "João", "falta": 0.1, "nota": 5.8, "sexo": "M", "trabalha": true },
+  { "nome": "Ana", "falta": 0.3, "nota": 9.1, "sexo": "F", "trabalha": false },
+  { "nome": "Carlos", "falta": 0.7, "nota": 4.2, "sexo": "M", "trabalha": true },
+  { "nome": "Fernanda", "falta": 0.0, "nota": 8.7, "sexo": "F", "trabalha": true },
+  { "nome": "Bruno", "falta": 0.4, "nota": 6.5, "sexo": "M", "trabalha": false },
+  { "nome": "Patrícia", "falta": 0.15, "nota": 9.4, "sexo": "F", "trabalha": false },
+  { "nome": "Lucas", "falta": 0.6, "nota": 5.1, "sexo": "M", "trabalha": true },
+  { "nome": "Juliana", "falta": 0.2, "nota": 7.2, "sexo": "F", "trabalha": true },
+  { "nome": "Pedro", "falta": 0.05, "nota": 6.8, "sexo": "M", "trabalha": false },
+  { "nome": "Larissa", "falta": 0.25, "nota": 8.3, "sexo": "F", "trabalha": true }
+]
