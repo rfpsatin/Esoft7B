@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clustering de Alunos - K-Means</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Sistema de Clustering de Alunos</h1>
+        
+        <div class="controls">
+            <button onclick="gerarDados()">Gerar Novos Alunos</button>
+            <button onclick="executarClustering()">Executar Clustering</button>
+            <button onclick="resetar()">Resetar</button>
+        </div>
+
+        <div class="info">
+            <strong>Como funciona:</strong> O algoritmo K-Means agrupa os alunos em 2 clusters baseado nas suas notas de Matemática e Português. 
+            Os centroides (representantes) são escolhidos aleatoriamente no início e depois recalculados a cada iteração.
+        </div>
+
+        <div id="iterationInfo" class="iteration-info"></div>
+        
+        <div id="results" class="results"></div>
+    </div>
+</body>
+</html>
