@@ -77,7 +77,6 @@ class PreparadorParaKNN:
             for r, val in zip([r for r in registros if r.categoria is not None], codificados):
                 r.dados.append(val)  # Adiciona ao final da lista de dados
 
-# Exemplo de uso
 r1 = Registro("A", [1.0, 2.0], categoria="cliente")
 r2 = Registro("B", [8.0, 9.0], categoria="empresa")
 r3 = Registro("C", [2.0, 2.5], categoria="cliente")
@@ -92,3 +91,33 @@ kmeans.imprimir_clusters()
 
 preparador = PreparadorParaKNN()
 preparador.codificar_categoricos([r1, r2, r3, r4])
+
+class KNN:
+    def __init__(self, k=3):
+        self.k = k
+        self.registros = []
+
+    def fit(self, registros):
+        self.registros = registros
+
+    def _distancia(self, dados1, dados2):
+        return np.linalg.norm(np.array(dados1) - np.array(dados2))
+
+    def predict(self, registro):
+        distancias = []
+        for r in self.registros:
+            dist = self._distancia(registro.dados, r.dados)
+            distancias.append((dist, r.categoria))
+        distancias.sort(key=lambda x: x[0])
+        k_vizinhos = distancias[:self.k]
+        categorias = [cat for _, cat in k_vizinhos if cat is not None]
+        if not categorias:
+            return None
+        return max(set(categorias), key=categorias.count)
+
+knn = KNN(k=3)
+knn.fit([r1, r2, r3, r4])
+
+novo_registro = Registro("E", [2.0, 2.2, 0])
+predicao = knn.predict(novo_registro)
+print(f"Categoria prevista para o novo registro: {predicao}")
