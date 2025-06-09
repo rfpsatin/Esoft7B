@@ -1,6 +1,6 @@
-import { CreateClienteDto } from './dto/create-cliente.dto';
+import { Cliente } from './cluster';
 
-export const clientesMock: CreateClienteDto[] = [
+export const clientesMock: Cliente[] = [
     {
         idade: 30,
         formacaoEducacional: 'Ensino Superior Completo',
