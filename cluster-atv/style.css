@@ -1,0 +1,31 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  background: #f2f2f2;
+}
+
+input, button {
+  margin: 5px;
+  padding: 8px;
+}
+
+.cluster {
+  margin-top: 20px;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+}
+
+.student {
+  background: #fff;
+  padding: 5px;
+  margin: 5px 0;
+  border-radius: 3px;
+}
+
+.centroid {
+  background: #ffeeba;
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
