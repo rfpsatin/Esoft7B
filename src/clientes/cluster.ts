@@ -14,7 +14,6 @@ class Cluster {
   centroide: number[] = [];
 
   constructor() {
-    // Inicializa o cluster com os clientes do mock
     this.elementos = [...clientesMock];
     this.calcularCentroide();
   }
