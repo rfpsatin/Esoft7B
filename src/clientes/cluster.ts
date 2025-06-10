@@ -1,6 +1,6 @@
 import { clientesMock } from './clientes.mock';
 
-type Cliente = {
+export type Cliente = {
   formacaoEducacional: string;
   idade: number;
   estado: string;
@@ -9,12 +9,12 @@ type Cliente = {
   ticketMedio: number;
 };
 
-class Cluster {
-  elementos: Cliente[];
+export class Cluster {
+  elementos: Cliente[] = [];
   centroide: number[] = [];
 
-  constructor() {
-    this.elementos = [...clientesMock];
+  constructor(elementos: Cliente[] = []) {
+    this.elementos = [...elementos];
     this.calcularCentroide();
   }
 
@@ -24,9 +24,26 @@ class Cluster {
   }
 
   private transformar(cliente: Cliente): number[] {
-    const formacaoMap = { 'fundamental': 1, 'medio': 2, 'superior': 3 };
-    const estadoMap = { 'SP': 1, 'RJ': 2, 'MG': 3, 'RS': 4 };
-    const regiaoMap = { 'sudeste': 1, 'sul': 2, 'norte': 3, 'nordeste': 4, 'centro-oeste': 5 };
+    const formacaoMap = {
+      'Ensino Fundamental Completo': 1,
+      'Ensino Médio Incompleto': 2,
+      'Ensino Médio Completo': 3,
+      'Ensino Superior Incompleto': 4,
+      'Ensino Superior Completo': 5,
+      'Pós-Graduação': 6
+    };
+    const estadoMap = {
+      'AC': 1, 'AL': 2, 'AP': 3, 'AM': 4, 'BA': 5, 'CE': 6, 'DF': 7, 'ES': 8, 'GO': 9, 'MA': 10,
+      'MT': 11, 'MS': 12, 'MG': 13, 'PA': 14, 'PB': 15, 'PR': 16, 'PE': 17, 'PI': 18, 'RJ': 19,
+      'RN': 20, 'RS': 21, 'RO': 22, 'RR': 23, 'SC': 24, 'SP': 25, 'SE': 26, 'TO': 27
+    };
+    const regiaoMap = {
+      'Norte': 1,
+      'Nordeste': 2,
+      'Centro-Oeste': 3,
+      'Sudeste': 4,
+      'Sul': 5
+    };
     return [
       formacaoMap[cliente.formacaoEducacional] || 0,
       cliente.idade,
@@ -39,35 +56,18 @@ class Cluster {
 
   calcularCentroide() {
     if (this.elementos.length === 0) return;
-    const soma = this.elementos
-      .map(e => this.transformar(e))
-      .reduce((acc, val) => acc.map((x, i) => x + val[i]));
-    this.centroide = soma.map(x => x / this.elementos.length);
+    const atributos = this.elementos.map(e => this.transformar(e));
+    const centroide: number[] = [];
+    for (let i = 0; i < atributos[0].length; i++) {
+      const valores = atributos.map(a => a[i]);
+      const media = valores.reduce((acc, v) => acc + v, 0) / valores.length;
+      centroide.push(media);
+    }
+    this.centroide = centroide;
   }
 
-  distancia(a: number[], b: number[]) {
-    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - b[i]) ** 2, 0));
-  }
-
-  extremos() {
-    return this.elementos
-      .map(e => ({
-        cliente: e,
-        distancia: this.distancia(this.transformar(e), this.centroide),
-      }))
-      .sort((a, b) => b.distancia - a.distancia);
-  }
-
-  knn(cliente: Cliente, k: number) {
-    const alvo = this.transformar(cliente);
-    return this.elementos
-      .map(e => ({
-        cliente: e,
-        distancia: this.distancia(this.transformar(e), alvo),
-      }))
-      .sort((a, b) => a.distancia - b.distancia)
-      .slice(0, k);
+  distancia(cliente: Cliente) {
+    const a = this.transformar(cliente);
+    return Math.sqrt(a.reduce((sum, val, i) => sum + (val - this.centroide[i]) ** 2, 0));
   }
 }
-
-export { Cluster, Cliente };
