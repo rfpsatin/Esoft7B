@@ -1,98 +1,127 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Projeto de Clustering e KNN - Tópicos em Engenharia de Software
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**Participantes:**  
+Anna Júlia Duarte Prando — R.A: 22045748-2  
+João Pedro dos Santos Lussani — R.A: 22014550-2  
+Wesley dos Santos David — R.A: 22171156-2
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**Curso:** Engenharia de Software — 7º Semestre — UniCesumar  
+**Professor:** Ricardo Satin  
+**Disciplina:** Tópicos em Engenharia de Software
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Apresentação
 
-## Project setup
+Este projeto consiste em um sistema de agrupamento (clustering) e classificação (KNN) de clientes, desenvolvido em Node.js/TypeScript para ser executado via terminal. O objetivo é demonstrar técnicas de agrupamento de dados e classificação utilizando conceitos de centroide, distância euclidiana e K-Nearest Neighbors (KNN).
 
-```bash
-$ npm install
+---
+
+## O que o programa faz
+
+- **Agrupa clientes em dois clusters** com base em seus atributos.
+- **Calcula o centroide** (média dos atributos) de cada cluster.
+- **Insere novos clientes** automaticamente no cluster mais próximo (menor distância euclidiana ao centroide).
+- **Recalcula o centroide** do cluster após cada inserção.
+- **Permite consultar os centroides** e o valor geral (soma dos atributos) de cada cluster.
+- **Executa o algoritmo KNN**: dado um cliente e um valor K, retorna os K clientes mais próximos (de qualquer cluster), mostrando a qual cluster cada vizinho pertence.
+- **Salva novos clientes** na base de dados (`clientes.mock.ts`), garantindo persistência para execuções futuras.
+
+---
+
+## Estrutura do Projeto
+
+- `src/clientes/clientes.mock.ts` — Base de dados dos clientes (mock).
+- `src/clientes/cluster.ts` — Classe `Cluster` e tipo `Cliente`.
+- `src/clientes/cluster-manager.ts` — Classe `ClusterManager` (gerencia clusters, inserção e KNN).
+- `src/clientes/cli.ts` — Interface de linha de comando (terminal).
+
+---
+
+## Como funciona
+
+1. **Inicialização:**  
+   O programa carrega os clientes do mock e divide em dois clusters. Cada cluster calcula seu centroide inicial.
+
+2. **Inserção de cliente:**  
+   Ao adicionar um novo cliente, o programa calcula a distância dele para o centroide de cada cluster e o insere no cluster mais próximo. O centroide desse cluster é recalculado.
+
+3. **Consulta de centroides:**  
+   Mostra a média (centroide) e a soma total dos atributos de cada cluster, além do número de elementos.
+
+4. **KNN:**  
+   Permite informar um cliente e um valor K, retornando os K clientes mais próximos (de qualquer cluster), mostrando a qual cluster pertencem e a distância.
+
+5. **Persistência:**  
+   Todo novo cliente inserido é salvo no arquivo `clientes.mock.ts`, garantindo que a base de dados seja atualizada.
+
+---
+
+## Como rodar o programa
+
+### Pré-requisitos
+
+- Node.js (versão 16 ou superior)
+- npm (gerenciador de pacotes)
+- TypeScript instalado globalmente ou via projeto
+
+### Instalação
+
+1. Clone o repositório:
+
+   ```sh
+   git clone <url-do-repositorio>
+   cd <pasta-do-projeto>
+   ```
+
+2. Instale as dependências:
+
+   ```sh
+   npm install
+   ```
+
+3. Compile o projeto:
+   ```sh
+   npx tsc
+   ```
+
+### Execução
+
+Execute o programa via terminal:
+
+```sh
+node dist/src/clientes/cli.js
 ```
 
-## Compile and run the project
+Ou, se preferir rodar direto sem compilar:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```sh
+npx ts-node src/clientes/cli.ts
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## Comandos disponíveis no terminal
 
-# e2e tests
-$ npm run test:e2e
+- **Adicionar cliente:**  
+  Insere um novo cliente, que será automaticamente classificado no cluster mais próximo.
 
-# test coverage
-$ npm run test:cov
-```
+- **Mostrar centroides:**  
+  Exibe a média (centroide) e a soma total dos atributos de cada cluster, além do número de elementos.
 
-## Deployment
+- **Executar KNN:**  
+  Permite informar os dados de um cliente e o valor de K, retornando os K clientes mais próximos e a qual cluster pertencem.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- **Sair:**  
+  Encerra o programa.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+---
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+## Observações
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- O arquivo `clientes.mock.ts` é atualizado automaticamente com cada novo cliente inserido.
+- O programa utiliza distância euclidiana para classificação e KNN.
+- Os dados categóricos são convertidos para valores numéricos por meio de mapeamento interno.
+- O centroide de cada cluster é recalculado usando a média dos atributos dos clientes presentes.
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
