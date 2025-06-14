@@ -23,4 +23,20 @@ export class ClusterManager {
       console.log(cluster.centroide.map((v, j) => `  Atributo ${j + 1}: ${v.toFixed(2)}`).join('\n'));
     });
   }
+
+  knn(cliente: Cliente, k: number) {
+    const todos: { cliente: Cliente; cluster: number }[] = [];
+    this.clusters.forEach((cluster, idx) => {
+      cluster.elementos.forEach(c => todos.push({ cliente: c, cluster: idx + 1 }));
+    });
+
+    const clusterTemp = new Cluster();
+    return todos
+      .map(obj => ({
+        ...obj,
+        distancia: clusterTemp.distanciaEntreClientes(cliente, obj.cliente)
+      }))
+      .sort((a, b) => a.distancia - b.distancia)
+      .slice(0, k);
+  }
 }

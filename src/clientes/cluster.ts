@@ -70,4 +70,10 @@ export class Cluster {
     const a = this.transformar(cliente);
     return Math.sqrt(a.reduce((sum, val, i) => sum + (val - this.centroide[i]) ** 2, 0));
   }
+
+  distanciaEntreClientes(a: Cliente, b: Cliente) {
+    const va = this.transformar(a);
+    const vb = this.transformar(b);
+    return Math.sqrt(va.reduce((sum, val, i) => sum + (val - vb[i]) ** 2, 0));
+  }
 }
