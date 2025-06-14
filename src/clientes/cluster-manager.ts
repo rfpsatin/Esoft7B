@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { Cluster, Cliente } from './cluster';
 import { clientesMock } from './clientes.mock';
 
@@ -15,12 +17,31 @@ export class ClusterManager {
     const distancias = this.clusters.map(cluster => cluster.distancia(cliente));
     const idx = distancias.indexOf(Math.min(...distancias));
     this.clusters[idx].adicionar(cliente);
+    this.salvarClienteNoMock(cliente); 
+  }
+
+  private salvarClienteNoMock(cliente: Cliente) {
+    const mockPath = path.resolve(__dirname, 'clientes.mock.ts');
+    
+    let conteudo = fs.readFileSync(mockPath, 'utf-8');
+    
+    const pos = conteudo.lastIndexOf(']');
+    if (pos !== -1) {
+      
+      const clienteStr = `,\n    ${JSON.stringify(cliente, null, 4)}`;
+      conteudo = conteudo.slice(0, pos) + clienteStr + conteudo.slice(pos);
+      fs.writeFileSync(mockPath, conteudo, 'utf-8');
+    }
   }
 
   mostrarCentroides() {
     this.clusters.forEach((cluster, i) => {
-      console.log(`\nCentroide do Cluster ${i + 1}:`);
-      console.log(cluster.centroide.map((v, j) => `  Atributo ${j + 1}: ${v.toFixed(2)}`).join('\n'));
+      console.log(`\n--- Cluster ${i + 1} ---`);
+      console.log('Centroide (média dos atributos):');
+      cluster.centroide.forEach((v, j) => {
+        console.log(`  Atributo ${j + 1}: ${v.toFixed(2)}`);
+      });
+      console.log('Total de elementos:', cluster.elementos.length);
     });
   }
 
