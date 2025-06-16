@@ -23,11 +23,11 @@ class Estudante {
         this.comportamento = comportamento;
     }
 
-    double distanceTo(Estudante other) {
-        double pesoIdade = 8.0;
-        double pesoPresenca = 80.0;
+    double distanceTo(Estudante other) { //Coeficiente com pesos
+        double pesoIdade = 90.0;
+        double pesoPresenca = 70.0;
         double pesoNota = 8.0;
-        double pesoComportamento = 2.0;
+        double pesoComportamento = 50.0;
 
         double diffIdade = (this.idade - other.idade) / pesoIdade;
         double diffPresenca = (this.presenca - other.presenca) / pesoPresenca;
@@ -48,5 +48,9 @@ class Estudante {
         };
         return String.format("Idade: %.1f, Presença: %.1f%%, Nota: %.1f, Comportamento: %s",
                 idade, presenca, medianaNota, comportamentoStr);
+    }
+
+    public Double sumAllAtributes() {
+        return (this.idade + this.comportamento + this.presenca + this.medianaNota);
     }
 }
