@@ -1,14 +1,16 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
-    private static List<Estudante> inicializarCentroides(List<Estudante> estudantes, int k) {
+    private static List<Estudante> inicializarCentroides(List<Estudante> estudantes, int qtdClusters) {
 
         List<Estudante> centroides = new ArrayList<>();
         centroides.add(estudantes.get(0));
 
-        for (int i = 1; i < k; i++) {
+        for (int i = 1; i < qtdClusters; i++) {
             double[] distancias = new double[estudantes.size()];
             double somaDistancias = 0.0;
 
@@ -139,7 +141,7 @@ public class Main {
                 new Estudante(19, 50.0, 4.0, "PREGUIÇOSO"),
                 new Estudante(15, 98.0, 9.5, "POSSUI_DOM"),
                 new Estudante(18, 78.0, 7.0, "ESFORÇADO"),
-                new Estudante(20, 45.0, 3.5, "PREGUIÇOSO"),
+                new Estudante(20, 95.0, 9.5, "PREGUIÇOSO"),
                 new Estudante(16, 92.0, 8.2, "POSSUI_DOM"),
                 new Estudante(17, 75.0, 6.8, "ESFORÇADO")
         );
@@ -154,5 +156,21 @@ public class Main {
         List<Cluster> clustersFinais = clusterize(alunos, qtdClusters, maxIteracoes);
 
         imprimirDados(clustersFinais);
+
+        // KNN
+        clustersFinais.sort(Comparator.comparing(cluster -> (cluster.centroide.sumAllAtributes())));
+        Map<Cluster, String> sortedTypedClusters = Map.ofEntries(
+                Map.entry(clustersFinais.getFirst(), "PESSIMO"),
+                Map.entry(clustersFinais.get(1), "MEIA BOMBA"),
+                Map.entry(clustersFinais.get(2), "OTIMO")
+        );
+        Estudante estudanteKnn = new Estudante(19, 50.0, 4.0, "PREGUIÇOSO");
+        Cluster closestCluster = clustersFinais.getFirst();
+        for (Cluster cluster : clustersFinais) {
+            if (estudanteKnn.distanceTo(cluster.centroide) < estudanteKnn.distanceTo(closestCluster.centroide)) {
+                closestCluster = cluster;
+            }
+        }
+        System.out.printf("\nO NOVO ESTUDANTE EH: %s", sortedTypedClusters.get(closestCluster));
     }
 }
