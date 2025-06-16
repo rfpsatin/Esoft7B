@@ -74,7 +74,6 @@ class Cluster {
     const dn = this.centroid.nota - point.nota;
     const ds = this.centroid.sexo - (point.sexo === 'Feminino' ? 1 : 0);
     const dt = this.centroid.trabalha - (point.trabalha ? 1 : 0);
-
     return Math.sqrt(df * df + dn * dn + ds * ds + dt * dt);
   }
 
@@ -84,7 +83,6 @@ class Cluster {
 }
 
 let registros: Registro[] = JSON.parse(fs.readFileSync('./registros.json', 'utf-8'));
-
 const c1 = new Cluster('C1');
 const c2 = new Cluster('C2');
 let c3: Cluster | null = null;
@@ -132,19 +130,11 @@ function removeFromClusters(nome: string): void {
 
 function verificarDispersao(limiar: number): void {
   const candidatos: Registro[] = [];
-
   for (const p of c1.points) {
-    const dist = c1.distanceTo(p);
-    if (dist > limiar) {
-      candidatos.push(p);
-    }
+    if (c1.distanceTo(p) > limiar) candidatos.push(p);
   }
-
   for (const p of c2.points) {
-    const dist = c2.distanceTo(p);
-    if (dist > limiar) {
-      candidatos.push(p);
-    }
+    if (c2.distanceTo(p) > limiar) candidatos.push(p);
   }
 
   if (candidatos.length === 0) {
@@ -160,7 +150,6 @@ function verificarDispersao(limiar: number): void {
 
   console.log(`Criado novo cluster C3 com ${c3.points.length} elementos:`);
   console.log(c3.points.map(p => `${p.nome}`));
-
   c1.updateCentroid();
   c2.updateCentroid();
 }
@@ -168,6 +157,60 @@ function verificarDispersao(limiar: number): void {
 registros.forEach(addToNearestCluster);
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+
+function kMeans(data: Registro[], k: number, maxIter = 100): Cluster[] {
+  const clusters: Cluster[] = [];
+  const shuffled = [...data].sort(() => Math.random() - 0.5);
+  for (let i = 0; i < k; i++) {
+    const cluster = new Cluster('Cluster ' + (i + 1));
+    cluster.centroid = {
+      falta: shuffled[i].falta,
+      nota: shuffled[i].nota,
+      sexo: shuffled[i].sexo === 'Feminino' ? 1 : 0,
+      trabalha: shuffled[i].trabalha ? 1 : 0
+    };
+    clusters.push(cluster);
+  }
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    clusters.forEach(c => c.points = []);
+    for (const p of data) {
+      let minDist = Infinity;
+      let closestCluster = clusters[0];
+      for (const cluster of clusters) {
+        const d = Math.sqrt(
+          Math.pow(cluster.centroid.falta - p.falta, 2) +
+          Math.pow(cluster.centroid.nota - p.nota, 2) +
+          Math.pow(cluster.centroid.sexo - (p.sexo === 'Feminino' ? 1 : 0), 2) +
+          Math.pow(cluster.centroid.trabalha - (p.trabalha ? 1 : 0), 2)
+        );
+        if (d < minDist) {
+          minDist = d;
+          closestCluster = cluster;
+        }
+      }
+      closestCluster.points.push(p);
+    }
+    clusters.forEach(c => c.updateCentroid());
+  }
+
+  return clusters;
+}
+
+function knnClassify(data: Registro[], input: Registro, k: number): Registro[] {
+  const distances = data.map(p => ({
+    point: p,
+    distance: Math.sqrt(
+      Math.pow(p.falta - input.falta, 2) +
+      Math.pow(p.nota - input.nota, 2) +
+      Math.pow((p.sexo === 'Feminino' ? 1 : 0) - (input.sexo === 'Feminino' ? 1 : 0), 2) +
+      Math.pow((p.trabalha ? 1 : 0) - (input.trabalha ? 1 : 0), 2)
+    )
+  }));
+  distances.sort((a, b) => a.distance - b.distance);
+  return distances.slice(0, k).map(d => d.point);
+}
 
 function showMenu(): void {
   console.log("\n📊 MENU:");
@@ -177,6 +220,8 @@ function showMenu(): void {
   console.log("4 - Ver membros dos clusters");
   console.log("5 - Limpar tela");
   console.log("6 - Análise de dispersão e novo cluster");
+  console.log("7 - Executar K-Means");
+  console.log("8 - Executar KNN para novo registro");
   console.log("0 - Sair");
   rl.question("Escolha uma opção: ", handleMenu);
 }
@@ -189,16 +234,15 @@ function handleMenu(option: string): void {
       if (c3) console.log("Centroide C3:", c3.centroid);
       break;
     case '2':
-      rl.question("Nome: ", nome => {
-        rl.question("Faltas: ", faltaStr => {
-          rl.question("Nota: ", notaStr => {
-            rl.question("Sexo (F/M): ", sexoInput => {
-              rl.question("Trabalha? (S/N): ", trabalhaInput => {
+      rl.question("Nome: ", (nome: any) => {
+        rl.question("Faltas: ", (faltaStr: string) => {
+          rl.question("Nota: ", (notaStr: string) => {
+            rl.question("Sexo (F/M): ", (sexoInput: string) => {
+              rl.question("Trabalha? (S/N): ", (trabalhaInput: string) => {
                 const falta = parseFloat(faltaStr);
                 const nota = parseFloat(notaStr);
                 const sexo = sexoInput.trim().toUpperCase() === 'F' ? 'Feminino' : 'Masculino';
                 const trabalha = trabalhaInput.trim().toUpperCase() === 'S';
-
                 const novo: Registro = { nome, falta, nota, sexo, trabalha };
                 registros.push(novo);
                 addToNearestCluster(novo);
@@ -210,7 +254,7 @@ function handleMenu(option: string): void {
       });
       return;
     case '3':
-      rl.question("Nome para remover: ", nome => {
+      rl.question("Nome para remover: ", (nome: string) => {
         registros = registros.filter(r => r.nome !== nome);
         removeFromClusters(nome);
         showMenu();
@@ -226,10 +270,37 @@ function handleMenu(option: string): void {
       console.clear();
       break;
     case '6':
-      rl.question("Informe o limiar de distância: ", limiarStr => {
-        const limiar = parseFloat(limiarStr);
-        verificarDispersao(limiar);
+      rl.question("Informe o limiar de distância: ", (limiarStr: string) => {
+        verificarDispersao(parseFloat(limiarStr));
         showMenu();
+      });
+      return;
+    case '7':
+      const clusters = kMeans(registros, 3);
+      clusters.forEach((c, i) => {
+        console.log(`\nCluster ${i + 1} (Total: ${c.points.length}):`);
+        c.points.forEach(p => console.log(` - ${p.nome}`));
+      });
+      break;
+    case '8':
+      rl.question("Faltas: ", (faltaStr: string) => {
+        rl.question("Nota: ", (notaStr: string) => {
+          rl.question("Sexo (F/M): ", (sexoInput: string) => {
+            rl.question("Trabalha? (S/N): ", (trabalhaInput: string) => {
+              const falta = parseFloat(faltaStr);
+              const nota = parseFloat(notaStr);
+              const sexo = sexoInput.trim().toUpperCase() === 'F' ? 'Feminino' : 'Masculino';
+              const trabalha = trabalhaInput.trim().toUpperCase() === 'S';
+              const input: Registro = { nome: 'Novo', falta, nota, sexo, trabalha };
+              const vizinhos = knnClassify(registros, input, 3);
+              console.log(`\n3 Vizinhos mais próximos:`);
+              vizinhos.forEach(v => {
+                console.log(` - ${v.nome} | Falta: ${v.falta}, Nota: ${v.nota}, Sexo: ${v.sexo}, Trabalha: ${v.trabalha}`);
+              });
+              showMenu();
+            });
+          });
+        });
       });
       return;
     case '0':
